@@ -91,9 +91,9 @@ class MarkovBridge(TaskLitModule):
 
         # Load structure encoder
         if version == 'cath_4.2':
-            self.load_encoder_from_ckpt('/data2/zhuyiheng/MyGithub/Bridge-IF/ckpts/cath_4.2/lm_design_esm1b_650m_pifold/checkpoints/best.ckpt')
+            self.load_encoder_from_ckpt('./ckpts/cath_4.2/lm_design_esm1b_650m_pifold/checkpoints/best.ckpt')
         elif version == 'cath_4.3':
-            self.load_encoder_from_ckpt('/data2/zhuyiheng/MyGithub/Bridge-IF/ckpts/cath_4.3/lm_design_esm1b_650m_pifold/checkpoints/best.ckpt')
+            self.load_encoder_from_ckpt('./ckpts/cath_4.3/lm_design_esm1b_650m_pifold/checkpoints/best.ckpt')
         for param in self.model.encoder.parameters():
             param.requires_grad_(False)
 
