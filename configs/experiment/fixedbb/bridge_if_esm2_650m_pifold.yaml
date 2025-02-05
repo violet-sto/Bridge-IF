@@ -1,0 +1,81 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - /datamodule: cath_4.2
+  - /callbacks: fixedbb
+  - /trainer: default
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+# name of the run determines folder name in logs
+name: "fixedbb/cath_4.2/bridge_if_esm2_650m_pifold"
+
+datamodule:
+  alphabet:
+    name: esm
+    featurizer: cath
+    featurizer_cfg:
+      to_pifold_format: true
+
+model:
+  _target_: esm2_adapter_time_pifold
+  encoder:
+    d_model: 128
+    use_esm_alphabet: true
+  
+  name: esm2_t33_650M_UR50D
+  adapter_layer_indices: [-1, ]
+
+task:
+  _target_: fixedbb/mb_pifold
+  alphabet: ${datamodule.alphabet}
+  learning:
+    noise: full_mask # enable initial prediction with full masking
+    use_context: false
+    reparam: true
+    
+  criterion:
+    _target_: src.modules.variational_lower_bound.TrainLossVLB
+    lambda_train: [5, 0]
+  optimizer:
+    type: adamw
+    _partial_: true
+    lr: ${train.lr}
+    betas: 
+      - 0.9
+      - 0.98
+    weight_decay: 0.0001
+  lr_scheduler:
+    type: noam
+    warmup_steps: 4000
+    model_size: 128
+    lr: ${train.lr}
+    warmup_init_lr: 1e-07
+  generator:
+    diffusion_steps: 5
+    diffusion_noise_schedule: interpolation
+    transition: null
+    direct: true
+    strategy: 'discrete_diffusion'
+  version:
+
+train:
+  seed: 42
+  lr: 0.001
+  monitor: "val/acc_median"
+  mode: "max"
+
+trainer:
+  min_epochs: 10
+  max_epochs: 10000
+  gradient_clip_val: 0.0
+  # val_check_interval: 10
+  check_val_every_n_epoch: 1
+  num_sanity_val_steps: 1
+  reload_dataloaders_every_n_epochs: 1
+  use_distributed_sampler: false
+  max_steps: 200_000

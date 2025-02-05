@@ -1,0 +1,8 @@
+defaults:
+  - default.yaml
+
+devices: auto
+strategy: ddp
+precision: 32
+
+# sync_batchnorm: True
