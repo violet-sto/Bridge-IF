@@ -22,8 +22,8 @@ def main(config: DictConfig):
 
     # Imports can be nested inside @hydra.main to optimize tab completion
     # https://github.com/facebookresearch/hydra/issues/934
-    from bridge import utils
-    from bridge.testing_pipeline import test
+    from src import utils
+    from src import test
 
     # resolve user provided config
     config = utils.resolve_experiment_config(config)
